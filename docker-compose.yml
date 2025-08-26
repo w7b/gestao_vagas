@@ -14,8 +14,8 @@ services:
       - 5432:5432
     environment:
       - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=gestao_vagas
+        - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=gestao_vagas_4d7j
   prometheus:
     image: prom/prometheus:latest
     volumes:
