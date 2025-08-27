@@ -20,11 +20,12 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -44,10 +45,9 @@ public class CandidateController {
     @PostMapping("/")
     @Operation(summary = "Cadastro de candidatos", description = "endpoint responsável por cadastrar candidatos")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", content = {
-                    @Content(schema = @Schema(implementation = CandidateEntity.class))
-            }),
-            @ApiResponse(responseCode = "400", description = "User has exists")
+        @ApiResponse(responseCode = "200", content = {
+            @Content(schema = @Schema(implementation = CandidateEntity.class))
+        }), @ApiResponse(responseCode = "400", description = "User has exists")
     })
     public ResponseEntity<Object> create(@Valid @RequestBody CandidateEntity candidateEntity) {
         try {
@@ -62,16 +62,12 @@ public class CandidateController {
     @PreAuthorize("hasRole('CANDIDATE')")
     @Operation(summary = "Perfil do candidato", description = "Essa função é responsável por buscar as informações do perfil do candidato")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", content = {
-                    @Content(
-                            array = @ArraySchema(schema = @Schema(implementation = ProfileCandidateResponseDTO.class))
-                    )
-            }),
-            @ApiResponse(responseCode = "400", description = "User not found")
+        @ApiResponse(responseCode = "200", content = {
+            @Content(array = @ArraySchema(schema = @Schema(implementation = ProfileCandidateResponseDTO.class)))
+        }), @ApiResponse(responseCode = "400", description = "User not found")
     })
     @SecurityRequirement(name = "jwt_auth")
     public ResponseEntity<Object> get(HttpServletRequest request) {
-
         var idCandidate = request.getAttribute("candidate_id");
         try {
             var profile = this.profileCandidateService.execute(
@@ -84,17 +80,28 @@ public class CandidateController {
 
     @GetMapping("/jobs")
     @PreAuthorize("hasRole('CANDIDATE')")
-    @Operation(summary = "Listagem de vagas disponiveis ao candidato")
+    @Operation(summary = "Listagem de vagas disponiveis ao candidato não paginadas")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", content = {
-                    @Content(
-                            array = @ArraySchema(schema = @Schema(implementation = JobEntity.class))
-                    )
-            })
+        @ApiResponse(responseCode = "200", content = {
+            @Content(array = @ArraySchema(schema = @Schema(implementation = JobEntity.class)))
+        })
     })
     @SecurityRequirement(name = "jwt_auth")
-    public List<JobEntity> findJobByFilter(@RequestParam String filter) {
+    public Page<JobEntity> findJobByFilter(@RequestParam String filter) {
         return this.listAllJobsService.execute(filter);
+    }
+
+    @GetMapping("/jobs/pageable")
+    @PreAuthorize("hasRole('CANDIDATE')")
+    @Operation(summary = "Listagem de vagas disponiveis ao candidato paginadas")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", content = {
+            @Content(array = @ArraySchema(schema = @Schema(implementation = JobEntity.class)))
+        })
+    })
+    @SecurityRequirement(name = "jwt_auth")
+    public Page<JobEntity> findJobByPageable(@RequestParam String filter, Pageable pageable) {
+        return this.listAllJobsService.getPageable(filter, pageable.getPageNumber(), pageable.getPageSize());
     }
 
     @PostMapping("/job/apply")
@@ -109,6 +116,6 @@ public class CandidateController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
     }
+
 }

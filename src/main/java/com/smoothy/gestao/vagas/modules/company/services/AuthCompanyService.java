@@ -5,7 +5,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.smoothy.gestao.vagas.modules.company.dto.AuthCompanyDTO;
 import com.smoothy.gestao.vagas.modules.company.dto.AuthCompanyResponseDTO;
 import com.smoothy.gestao.vagas.modules.company.repositories.CompanyRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,11 +21,13 @@ public class AuthCompanyService {
     @Value("${security.token.secret}")
     private String secretKey;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public AuthCompanyService(CompanyRepository companyRepository, PasswordEncoder passwordEncoder) {
+        this.companyRepository = companyRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public AuthCompanyResponseDTO execute(AuthCompanyDTO authCompanyDTO) throws AuthenticationException {
         var companyExists = this.companyRepository.findByUsername(authCompanyDTO.getUsername()).orElseThrow(

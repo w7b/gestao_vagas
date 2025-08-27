@@ -6,7 +6,6 @@ import com.smoothy.gestao.vagas.modules.candidate.entity.ApplyJobEntity;
 import com.smoothy.gestao.vagas.modules.candidate.repository.ApplyJobRepository;
 import com.smoothy.gestao.vagas.modules.candidate.repository.CandidateRepository;
 import com.smoothy.gestao.vagas.modules.company.repositories.JobRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -15,14 +14,17 @@ import java.util.UUID;
 public class ApplyJobCandidateService {
 
 
-    @Autowired
-    private CandidateRepository candidateRepository;
+    private final CandidateRepository candidateRepository;
 
-    @Autowired
-    private JobRepository jobRepository;
+    private final JobRepository jobRepository;
 
-    @Autowired
-    private ApplyJobRepository applyJobRepository;
+    private final ApplyJobRepository applyJobRepository;
+
+    public ApplyJobCandidateService(CandidateRepository candidateRepository, JobRepository jobRepository, ApplyJobRepository applyJobRepository) {
+        this.candidateRepository = candidateRepository;
+        this.jobRepository = jobRepository;
+        this.applyJobRepository = applyJobRepository;
+    }
 
 
     public ApplyJobEntity execute(UUID idCandidate, UUID idJob) {

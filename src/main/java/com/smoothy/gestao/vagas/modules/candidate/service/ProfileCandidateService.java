@@ -20,15 +20,13 @@ public class ProfileCandidateService {
                     throw new UserFoundException();
                 });
 
-        var candidateDTO = ProfileCandidateResponseDTO.builder()
+        return ProfileCandidateResponseDTO.builder()
         .description(candidate.getDescription())
         .username(candidate.getUsername())
         .name(candidate.getName())
         .email(candidate.getEmail())
         .id(candidate.getId())
         .build();
-
-        return candidateDTO;
     }
 
 }

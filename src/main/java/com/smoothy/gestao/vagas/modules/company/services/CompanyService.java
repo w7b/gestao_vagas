@@ -3,18 +3,19 @@ package com.smoothy.gestao.vagas.modules.company.services;
 import com.smoothy.gestao.vagas.exceptions.UserFoundException;
 import com.smoothy.gestao.vagas.modules.company.entity.CompanyEntity;
 import com.smoothy.gestao.vagas.modules.company.repositories.CompanyRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CompanyService {
 
-    @Autowired
-    private CompanyRepository repository;
+    private final CompanyRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public CompanyService(CompanyRepository repository, PasswordEncoder passwordEncoder) {
+        this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public CompanyEntity execute(CompanyEntity companyEntity) {
         this.repository.findByUsernameOrEmail(companyEntity.getUsername(), companyEntity.getEmail()).ifPresent((user) -> {

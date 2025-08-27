@@ -4,7 +4,6 @@ import com.smoothy.gestao.vagas.modules.company.dto.AuthCompanyDTO;
 import com.smoothy.gestao.vagas.modules.company.services.AuthCompanyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Company", description = "Endpoints relacionados as company")
 public class AuthCompanyController {
 
-    @Autowired
-    private AuthCompanyService authCompanyService;
+    private final AuthCompanyService authCompanyService;
+
+    public AuthCompanyController(AuthCompanyService authCompanyService) {
+        this.authCompanyService = authCompanyService;
+    }
 
     @PostMapping("/auth")
     @Operation(summary = "Login de company's", description = "Essa função é responsável efetuar o login de uma empresa")

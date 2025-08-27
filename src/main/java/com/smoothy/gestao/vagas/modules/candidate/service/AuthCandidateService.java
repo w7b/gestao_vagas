@@ -2,10 +2,9 @@ package com.smoothy.gestao.vagas.modules.candidate.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.smoothy.gestao.vagas.modules.candidate.repository.CandidateRepository;
 import com.smoothy.gestao.vagas.modules.candidate.dto.AuthCandidateRequestDTO;
 import com.smoothy.gestao.vagas.modules.candidate.dto.AuthCandidateResponseDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.smoothy.gestao.vagas.modules.candidate.repository.CandidateRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,16 +21,17 @@ public class AuthCandidateService {
     @Value("${security.token.secret-two}")
     private String secretKey;
 
-    @Autowired
-    private CandidateRepository candidateRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final CandidateRepository candidateRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public AuthCandidateService(CandidateRepository candidateRepository, PasswordEncoder passwordEncoder) {
+        this.candidateRepository = candidateRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public AuthCandidateResponseDTO execute(AuthCandidateRequestDTO authCandidateRequestDTO) throws AuthenticationException {
         var candidate = this.candidateRepository.findByUsername(authCandidateRequestDTO.username())
-                .orElseThrow( () -> {
-                    throw new UsernameNotFoundException("Username/Password incorrect or not found");
-                });
+                .orElseThrow(() -> new UsernameNotFoundException("Username/Password incorrect or not found"));
 
         var passwordMatchs = this.passwordEncoder.matches(authCandidateRequestDTO.password(), candidate.getPassword());
 
