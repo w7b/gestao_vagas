@@ -27,3 +27,13 @@ jobs:
         run: docker build -t 007smoothy/gestao-vagas .
       - name: publish-image
         run: docker push 007smoothy/gestao-vagas
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: pull-image-docker-hub
+        run: docker pull 007smoothy/gestao-vagas:latest
+      - name: docker-remove
+        run: docker rm -f
+      - name: run-docker-image
+        run: docker run -d -p 8080:8080 -e DATABASE_URL=${{DATABASE_URL}} -e DATABASE_USERNAME=${{DATABASE_USERNAME}} -e DATABASE_PASSWORD=${{DATABASE_PASSWORD}} --name gestao-vagas 007smoothy/gestao-vagas
