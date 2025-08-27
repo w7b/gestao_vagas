@@ -3,16 +3,24 @@ name: gestao-de-vagas-production
 on:
   push:
     branches:
-      - [main]
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: checkout-code
         uses: actions/checkout@v4
-      - name: Setup java
+      - name: setup-java
         uses: actions/setup-java@v4
         with:
           distribution: 'graalvm'
           java-version: '17'
+      - name: build-project
+        run: mvn clean install
+      - name: docker-login
+        run: docker login -u ${{secrets.DOCKER.USERNAME}} -p ${{secrets.DOCKER.PASSWORD}}
+      - name: build-image
+        run: docker build -t 007smoothy/gestao-vagas .
+      - name: publish-image
+        run: docker push 007smoothy/gestao-vagas
